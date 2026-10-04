@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>时间记录</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f2f6f5;
+      color: #333;
+      padding: 16px;
+      padding-bottom: 40px;
+    }
+    h1 { font-size: 22px; margin-bottom: 16px; text-align: center; }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      margin-bottom: 16px;
+    }
+
+    .input-box {
+      width: 100%;
+      min-height: 70px;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #e0dcd5;
+      border-radius: 10px;
+      resize: vertical;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+    .input-box:focus { outline: none; border-color: #14b8a6; }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .row input[type="number"] {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #e0dcd5;
+      border-radius: 10px;
+      font-family: inherit;
+    }
+    .row input[type="number"]:focus { outline: none; border-color: #14b8a6; }
+
+    .btn-save {
+      width: 100%;
+      margin-top: 10px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      background: #14b8a6;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .btn-save:active { opacity: 0.85; }
+
+    .summary {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .summary-item {
+      flex: 1;
+      text-align: center;
+      padding: 12px 6px;
+      background: #f2f6f5;
+      border-radius: 10px;
+    }
+    .summary-num {
+      font-size: 20px;
+      font-weight: 700;
+      color: #14b8a6;
+    }
+    .summary-label {
+      font-size: 12px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .record-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #f0ece6;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .record-item:last-child { border-bottom: none; }
+    .record-info { flex: 1; min-width: 0; }
+    .record-note {
+      font-size: 16px;
+      line-height: 1.5;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .record-meta {
+      font-size: 13px;
+      color: #999;
+      margin-top: 6px;
+    }
+    .record-meta .duration {
+      color: #14b8a6;
+      font-weight: 600;
+    }
+    .btn-del {
+      align-self: flex-start;
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+    .btn-del:active { color: #f44336; }
+    .empty-tip {
+      text-align: center;
+      color: #bbb;
+      font-size: 14px;
+      padding: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⏱ 时间记录</h1>
+
+  <!-- 输入区 -->
+  <div class="card">
+    <textarea class="input-box" id="taskInput" placeholder="做了什么？比如：写方案、看书、跑步…"></textarea>
+    <div class="row">
+      <input type="number" id="hourInput" placeholder="小时" min="0" step="1">
+      <input type="number" id="minInput" placeholder="分钟" min="0" max="59" step="1">
+    </div>
+    <button class="btn-save" id="btnSave">记录</button>
+  </div>
+
+  <!-- 统计 + 历史 -->
+  <div class="card">
+    <div class="summary">
+      <div class="summary-item">
+        <div class="summary-num" id="sumCount">0</div>
+        <div class="summary-label">总条数</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-num" id="sumToday">0</div>
+        <div class="summary-label">今日(分钟)</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-num" id="sumTotal">0</div>
+        <div class="summary-label">累计(小时)</div>
+      </div>
+    </div>
+    <h2 style="font-size:17px;margin-bottom:8px;">历史记录</h2>
+    <div id="recordList"></div>
+  </div>
+
+<script>
+(function() {
+  'use strict';
+
+  var STORAGE_KEY = 'time_records_v1';
+  var taskInput = document.getElementById('taskInput');
+  var hourInput = document.getElementById('hourInput');
+  var minInput  = document.getElementById('minInput');
+  var btnSave   = document.getElementById('btnSave');
+  var recordList = document.getElementById('recordList');
+  var sumCount  = document.getElementById('sumCount');
+  var sumToday  = document.getElementById('sumToday');
+  var sumTotal  = document.getElementById('sumTotal');
+
+  // ---------- 读写 ----------
+  function loadRecords() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch (e) {
+      return [];
+    }
+  }
+  function saveRecords(records) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    } catch (e) {
+      alert('存储空间不足，请删除一些旧记录后再试。');
+    }
+  }
+
+  // ---------- 工具 ----------
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  function fullTimeStr() {
+    var d = new Date();
+    return todayStr() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  function formatDuration(mins) {
+    if (mins < 60) return mins + ' 分钟';
+    var h = Math.floor(mins / 60);
+    var m = mins % 60;
+    return m === 0 ? h + ' 小时' : h + ' 小时 ' + m + ' 分钟';
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, function(m) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
+    });
+  }
+
+  // ---------- 渲染 ----------
+  function renderList() {
+    var records = loadRecords();
+
+    // 统计
+    var today = todayStr();
+    var todayMins = 0;
+    var totalMins = 0;
+    records.forEach(function(r) {
+      totalMins += r.minutes;
+      if (r.time.indexOf(today) === 0) todayMins += r.minutes;
+    });
+    sumCount.textContent = records.length;
+    sumToday.textContent = todayMins;
+    sumTotal.textContent = (totalMins / 60).toFixed(1);
+
+    if (records.length === 0) {
+      recordList.innerHTML = '<div class="empty-tip">还没有记录，开始第一条吧～</div>';
+      return;
+    }
+
+    var html = '';
+    records.forEach(function(r) {
+      html += '<div class="record-item">'
+            +   '<div class="record-info">'
+            +     '<div class="record-note">' + escapeHtml(r.task) + '</div>'
+            +     '<div class="record-meta">'
+            +       '<span class="duration">' + formatDuration(r.minutes) + '</span>'
+            +       ' · ' + r.time
+            +     '</div>'
+            +   '</div>'
+            +   '<button class="btn-del" data-time="' + r.time + '" data-task="' + escapeHtml(r.task) + '">×</button>'
+            + '</div>';
+    });
+    recordList.innerHTML = html;
+
+    recordList.querySelectorAll('.btn-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var t = this.getAttribute('data-time');
+        var task = this.getAttribute('data-task');
+        if (confirm('确定删除这条记录吗？')) {
+          var recs = loadRecords().filter(function(r) {
+            return !(r.time === t && r.task === task);
+          });
+          saveRecords(recs);
+          renderList();
+        }
+      });
+    });
+  }
+
+  // ---------- 保存 ----------
+  btnSave.addEventListener('click', function() {
+    var task = taskInput.value.trim();
+    var h = parseInt(hourInput.value, 10) || 0;
+    var m = parseInt(minInput.value, 10) || 0;
+    var total = h * 60 + m;
+
+    if (!task) { alert('请写一下做了什么～'); return; }
+    if (total <= 0) { alert('请填写时长（小时或分钟）'); return; }
+
+    var records = loadRecords();
+    records.unshift({
+      task: task,
+      minutes: total,
+      time: fullTimeStr()
+    });
+    saveRecords(records);
+
+    taskInput.value = '';
+    hourInput.value = '';
+    minInput.value = '';
+    renderList();
+  });
+
+  // ---------- 初始化 ----------
+  renderList();
+})();
+</script>
+</body>
+</html>
