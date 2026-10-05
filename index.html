@@ -8,204 +8,80 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f2f6f5;
-      color: #333;
-      padding: 16px;
-      padding-bottom: 40px;
+      background: #f2f6f5; color: #333;
+      padding: 16px; padding-bottom: 40px;
     }
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .header h1 { font-size: 22px; }
     .plan-link {
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      background: #7c5cbf;
-      padding: 8px 12px;
-      border-radius: 20px;
-      text-decoration: none;
-      -webkit-tap-highlight-color: transparent;
-      white-space: nowrap;
+      font-size: 14px; font-weight: 600; color: #fff;
+      background: #7c5cbf; padding: 8px 12px; border-radius: 20px;
+      text-decoration: none; white-space: nowrap;
     }
-    .plan-link:active { opacity: 0.85; }
-
     .card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      margin-bottom: 16px;
+      background: #fff; border-radius: 16px; padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px;
     }
-
     .tabs {
-      display: flex;
-      gap: 6px;
-      background: #eef2f1;
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 14px;
+      display: flex; gap: 6px; background: #eef2f1;
+      border-radius: 10px; padding: 4px; margin-bottom: 14px;
     }
     .tab {
-      flex: 1;
-      padding: 9px 4px;
-      text-align: center;
-      font-size: 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      color: #666;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
+      flex: 1; padding: 9px 4px; text-align: center; font-size: 14px;
+      border-radius: 8px; cursor: pointer; color: #666; user-select: none;
     }
-    .tab.active {
-      background: #fff;
-      color: #14b8a6;
-      font-weight: 600;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    }
-
+    .tab.active { background: #fff; color: #14b8a6; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
     .input-box {
-      width: 100%;
-      min-height: 60px;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #e0dcd5;
-      border-radius: 10px;
-      resize: vertical;
-      font-family: inherit;
-      line-height: 1.5;
+      width: 100%; min-height: 60px; padding: 12px; font-size: 16px;
+      border: 1px solid #e0dcd5; border-radius: 10px;
+      resize: vertical; font-family: inherit; line-height: 1.5;
     }
     .input-box:focus { outline: none; border-color: #14b8a6; }
-
     .row { display: flex; gap: 10px; margin-top: 10px; }
     .row input {
-      flex: 1;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #e0dcd5;
-      border-radius: 10px;
-      font-family: inherit;
-      min-width: 0;
+      flex: 1; padding: 12px; font-size: 16px; border: 1px solid #e0dcd5;
+      border-radius: 10px; font-family: inherit; min-width: 0;
     }
     .row input:focus { outline: none; border-color: #14b8a6; }
-
     .field-label { font-size: 13px; color: #888; margin: 12px 0 4px; }
-
     .btn {
-      width: 100%;
-      margin-top: 12px;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      color: #fff;
-      background: #14b8a6;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
+      width: 100%; margin-top: 12px; padding: 14px; font-size: 16px;
+      font-weight: 600; color: #fff; background: #14b8a6; border: none;
+      border-radius: 10px; cursor: pointer;
     }
     .btn:active { opacity: 0.85; }
     .btn.red { background: #ef5350; }
-
-    .punch-panel { display: none; }
-    .punch-panel.show { display: block; }
-    .range-panel { display: none; }
-    .range-panel.show { display: block; }
-    .manual-panel { display: none; }
-    .manual-panel.show { display: block; }
-
-    .punch-status {
-      text-align: center;
-      padding: 14px;
-      background: #f2f6f5;
-      border-radius: 12px;
-      margin-bottom: 10px;
-    }
+    .manual-panel, .punch-panel, .range-panel { display: none; }
+    .manual-panel.show, .punch-panel.show, .range-panel.show { display: block; }
+    .punch-status { text-align: center; padding: 14px; background: #f2f6f5; border-radius: 12px; margin-bottom: 10px; }
     .punch-status .label { font-size: 13px; color: #888; }
-    .punch-status .time {
-      font-size: 26px;
-      font-weight: 700;
-      color: #14b8a6;
-      margin-top: 4px;
-      font-variant-numeric: tabular-nums;
-    }
-    .punch-from-plan {
-      text-align: center;
-      font-size: 13px;
-      color: #7c5cbf;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
+    .punch-status .time { font-size: 26px; font-weight: 700; color: #14b8a6; margin-top: 4px; font-variant-numeric: tabular-nums; }
+    .punch-from-plan { text-align: center; font-size: 13px; color: #7c5cbf; font-weight: 600; margin-bottom: 8px; }
     .range-panel input[type="datetime-local"] {
-      width: 100%;
-      padding: 12px;
-      font-size: 15px;
-      border: 1px solid #e0dcd5;
-      border-radius: 10px;
-      font-family: inherit;
-      margin-top: 4px;
+      width: 100%; padding: 12px; font-size: 15px; border: 1px solid #e0dcd5;
+      border-radius: 10px; font-family: inherit; margin-top: 4px;
     }
-    .range-panel input[type="datetime-local"]:focus { outline: none; border-color: #14b8a6; }
-    .range-duration {
-      text-align: center;
-      font-size: 14px;
-      color: #14b8a6;
-      font-weight: 600;
-      margin-top: 10px;
-    }
-
+    .range-duration { text-align: center; font-size: 14px; color: #14b8a6; font-weight: 600; margin-top: 10px; }
     .summary { display: flex; gap: 10px; margin-bottom: 12px; }
-    .summary-item {
-      flex: 1;
-      text-align: center;
-      padding: 12px 6px;
-      background: #f2f6f5;
-      border-radius: 10px;
-    }
+    .summary-item { flex: 1; text-align: center; padding: 12px 6px; background: #f2f6f5; border-radius: 10px; }
     .summary-num { font-size: 20px; font-weight: 700; color: #14b8a6; }
     .summary-label { font-size: 12px; color: #888; margin-top: 4px; }
-
     .record-item {
-      padding: 12px 0;
-      border-bottom: 1px solid #f0ece6;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
+      padding: 12px 0; border-bottom: 1px solid #f0ece6;
+      display: flex; gap: 10px; align-items: flex-start;
     }
     .record-item:last-child { border-bottom: none; }
     .record-info { flex: 1; min-width: 0; }
-    .record-note {
-      font-size: 16px;
-      line-height: 1.5;
-      word-break: break-word;
-      white-space: pre-wrap;
-    }
+    .record-note { font-size: 16px; line-height: 1.5; word-break: break-word; white-space: pre-wrap; }
     .record-meta { font-size: 13px; color: #999; margin-top: 6px; }
     .record-meta .duration { color: #14b8a6; font-weight: 600; }
     .record-meta .from-plan { color: #7c5cbf; }
-
     .btn-del {
-      align-self: flex-start;
-      background: none;
-      border: none;
-      color: #ccc;
-      font-size: 20px;
-      cursor: pointer;
-      padding: 0 4px;
-      flex-shrink: 0;
+      align-self: flex-start; background: none; border: none;
+      color: #ccc; font-size: 20px; cursor: pointer; padding: 0 4px; flex-shrink: 0;
     }
     .btn-del:active { color: #f44336; }
-
-    .empty-tip {
-      text-align: center;
-      color: #bbb;
-      font-size: 14px;
-      padding: 20px 0;
-    }
+    .empty-tip { text-align: center; color: #bbb; font-size: 14px; padding: 20px 0; }
   </style>
 </head>
 <body>
@@ -215,17 +91,13 @@
     <a class="plan-link" href="plan.html">🌙 晚间规划</a>
   </div>
 
-  <!-- 输入区 -->
   <div class="card">
     <div class="tabs">
       <div class="tab active" data-mode="manual">手动填写</div>
       <div class="tab" data-mode="punch">打点计时</div>
       <div class="tab" data-mode="range">选时间段</div>
     </div>
-
     <textarea class="input-box" id="taskInput" placeholder="做了什么？比如：写方案、看书、跑步…"></textarea>
-
-    <!-- 手动填写 -->
     <div class="manual-panel show" id="manualPanel">
       <div class="row">
         <input type="number" id="hourInput" placeholder="小时" min="0" step="1">
@@ -233,8 +105,6 @@
       </div>
       <button class="btn" id="btnSaveManual">记录</button>
     </div>
-
-    <!-- 打点计时 -->
     <div class="punch-panel" id="punchPanel">
       <div class="punch-from-plan" id="punchFromPlan" style="display:none;"></div>
       <div class="punch-status">
@@ -242,10 +112,7 @@
         <div class="time" id="punchClock">00:00:00</div>
       </div>
       <button class="btn" id="btnPunch">开始计时</button>
-      <div class="punch-list" id="punchList"></div>
     </div>
-
-    <!-- 选时间段 -->
     <div class="range-panel" id="rangePanel">
       <div class="field-label">开始时间</div>
       <input type="datetime-local" id="startTime">
@@ -256,21 +123,11 @@
     </div>
   </div>
 
-  <!-- 统计 + 历史 -->
   <div class="card">
     <div class="summary">
-      <div class="summary-item">
-        <div class="summary-num" id="sumCount">0</div>
-        <div class="summary-label">总条数</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-num" id="sumToday">0</div>
-        <div class="summary-label">今日(分钟)</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-num" id="sumTotal">0</div>
-        <div class="summary-label">累计(小时)</div>
-      </div>
+      <div class="summary-item"><div class="summary-num" id="sumCount">0</div><div class="summary-label">总条数</div></div>
+      <div class="summary-item"><div class="summary-num" id="sumToday">0</div><div class="summary-label">今日(分钟)</div></div>
+      <div class="summary-item"><div class="summary-num" id="sumTotal">0</div><div class="summary-label">累计(小时)</div></div>
     </div>
     <h2 style="font-size:17px;margin-bottom:8px;">历史记录</h2>
     <div id="recordList"></div>
@@ -280,30 +137,25 @@
 (function() {
   'use strict';
 
-  var RECORD_KEY = 'time_records_v1';   // 保持原名，不抹掉旧数据
-  var PLAN_KEY = 'night_plans_v1';      // 与 plan.html 共享
+  var RECORD_KEY = 'time_records_v1';
+  var PLAN_KEY = 'night_plans_v1';
 
   var taskInput = document.getElementById('taskInput');
   var tabs = document.querySelectorAll('.tab');
   var manualPanel = document.getElementById('manualPanel');
   var punchPanel = document.getElementById('punchPanel');
   var rangePanel = document.getElementById('rangePanel');
-
   var hourInput = document.getElementById('hourInput');
   var minInput = document.getElementById('minInput');
   var btnSaveManual = document.getElementById('btnSaveManual');
-
   var btnPunch = document.getElementById('btnPunch');
   var punchLabel = document.getElementById('punchLabel');
   var punchClock = document.getElementById('punchClock');
-  var punchList = document.getElementById('punchList');
   var punchFromPlan = document.getElementById('punchFromPlan');
-
   var startTime = document.getElementById('startTime');
   var endTime = document.getElementById('endTime');
   var rangeDuration = document.getElementById('rangeDuration');
   var btnSaveRange = document.getElementById('btnSaveRange');
-
   var recordList = document.getElementById('recordList');
   var sumCount = document.getElementById('sumCount');
   var sumToday = document.getElementById('sumToday');
@@ -312,9 +164,8 @@
   var currentMode = 'manual';
   var punchTimerId = null;
   var punchStartTs = null;
-  var punchPlanId = null;  // 如果这次计时来自"晚间规划"，记住规划 id
+  var punchPlanId = null;
 
-  // ---------- 通用 ----------
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
   function todayStr() {
     var d = new Date();
@@ -351,7 +202,6 @@
     });
   }
 
-  // ---------- 存储 ----------
   function loadRecords() {
     try { return JSON.parse(localStorage.getItem(RECORD_KEY)) || []; }
     catch (e) { return []; }
@@ -368,7 +218,6 @@
     localStorage.setItem(PLAN_KEY, JSON.stringify(plans));
   }
 
-  // ---------- 模式切换 ----------
   tabs.forEach(function(tab) {
     tab.addEventListener('click', function() {
       currentMode = this.getAttribute('data-mode');
@@ -389,7 +238,6 @@
     });
   });
 
-  // ---------- 手动 ----------
   btnSaveManual.addEventListener('click', function() {
     var task = taskInput.value.trim();
     var h = parseInt(hourInput.value, 10) || 0;
@@ -404,15 +252,11 @@
     renderList();
   });
 
-  // ---------- 打点计时 ----------
   function startPunchTimer(task, startTs, planId) {
     punchStartTs = startTs || Date.now();
     punchPlanId = planId || null;
     taskInput.value = task;
     punchLabel.textContent = '进行中：' + task;
-    punchList.innerHTML = '<div class="punch-point" style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;border-bottom:1px dashed #eee;color:#555;">'
-      + '<span>开始</span><span>'
-      + new Date(punchStartTs).toLocaleTimeString('zh-CN', {hour12:false}) + '</span></div>';
     btnPunch.textContent = '结束并记录';
     btnPunch.classList.add('red');
 
@@ -421,12 +265,11 @@
       var sec = Math.floor((Date.now() - punchStartTs) / 1000);
       punchClock.textContent = formatHMS(sec);
     }, 1000);
-    var sec0 = Math.floor((Date.now() - punchStartTs) / 1000);
-    punchClock.textContent = formatHMS(sec0);
+    punchClock.textContent = formatHMS(Math.floor((Date.now() - punchStartTs) / 1000));
 
     if (punchPlanId) {
       punchFromPlan.style.display = 'block';
-      punchFromPlan.textContent = '来自晚间规划 · 完成并记录后会标记为已完成';
+      punchFromPlan.textContent = '来自晚间规划 · 完成后会标记为已完成';
     } else {
       punchFromPlan.style.display = 'none';
     }
@@ -434,11 +277,9 @@
 
   btnPunch.addEventListener('click', function() {
     if (!punchStartTs) {
-      // 开始
       if (!taskInput.value.trim()) { alert('请先写一下要做什么～'); return; }
       startPunchTimer(taskInput.value.trim(), Date.now(), null);
     } else {
-      // 结束
       if (punchTimerId) { clearInterval(punchTimerId); punchTimerId = null; }
       var elapsedSec = Math.floor((Date.now() - punchStartTs) / 1000);
       var minutes = Math.max(1, Math.round(elapsedSec / 60));
@@ -449,11 +290,11 @@
 
       addRecord(task, minutes, startStr + ' → ' + endStr, planId ? 'plan' : '');
 
-      // 若来自规划，则把对应规划标记为已完成
       if (planId) {
         var plans = loadPlans().map(function(p) {
           if (p.id === planId) {
             p.done = true;
+            p.doneDate = todayStr();  // 关键：记录完成的日期
             p.doneAt = endStr;
             p.actual = minutes;
           }
@@ -462,7 +303,6 @@
         savePlans(plans);
       }
 
-      // 重置
       punchStartTs = null;
       punchPlanId = null;
       punchLabel.textContent = '已记录';
@@ -474,7 +314,6 @@
     }
   });
 
-  // ---------- 时间范围 ----------
   function updateRangeDuration() {
     if (!startTime.value || !endTime.value) { rangeDuration.textContent = ''; return; }
     var s = new Date(startTime.value).getTime();
@@ -505,24 +344,16 @@
     renderList();
   });
 
-  // ---------- 添加记录 ----------
   function addRecord(task, minutes, timeText, tag) {
     var records = loadRecords();
-    records.unshift({
-      task: task,
-      minutes: minutes,
-      time: timeText,
-      tag: tag || ''
-    });
+    records.unshift({ task: task, minutes: minutes, time: timeText, tag: tag || '' });
     saveRecords(records);
   }
 
-  // ---------- 渲染 ----------
   function renderList() {
     var records = loadRecords();
     var today = todayStr();
-    var todayMins = 0;
-    var totalMins = 0;
+    var todayMins = 0, totalMins = 0;
     records.forEach(function(r) {
       totalMins += r.minutes;
       if (r.time.indexOf(today) === 0) todayMins += r.minutes;
@@ -535,7 +366,6 @@
       recordList.innerHTML = '<div class="empty-tip">还没有记录，开始第一条吧～</div>';
       return;
     }
-
     var html = '';
     records.forEach(function(r) {
       html += '<div class="record-item">'
@@ -545,8 +375,7 @@
             +       '<span class="duration">' + formatDuration(r.minutes) + '</span>'
             +       ' · ' + escapeHtml(r.time)
             +       (r.tag === 'plan' ? ' · <span class="from-plan">🌙 规划</span>' : '')
-            +     '</div>'
-            +   '</div>'
+            +     '</div></div>'
             +   '<button class="btn-del" data-time="' + escapeHtml(r.time) + '" data-task="' + escapeHtml(r.task) + '">×</button>'
             + '</div>';
     });
@@ -567,7 +396,6 @@
     });
   }
 
-  // ---------- 检查是否从 plan.html 跳过来要启动计时 ----------
   function checkPendingTimer() {
     var raw = null;
     try { raw = sessionStorage.getItem('pending_timer_task'); } catch (e) {}
@@ -576,7 +404,6 @@
     var data = JSON.parse(raw);
     if (!data || !data.task) return;
 
-    // 自动切到打点计时 tab
     currentMode = 'punch';
     tabs.forEach(function(t) { t.classList.remove('active'); });
     document.querySelector('.tab[data-mode="punch"]').classList.add('active');
@@ -588,7 +415,6 @@
     renderList();
   }
 
-  // ---------- 初始化 ----------
   renderList();
   checkPendingTimer();
 })();
