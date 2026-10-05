@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>晚间规划</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f4f1fa;
+      color: #333;
+      padding: 16px;
+      padding-bottom: 40px;
+    }
+    h1 { font-size: 22px; margin-bottom: 4px; text-align: center; }
+    .subtitle { text-align: center; font-size: 13px; color: #999; margin-bottom: 16px; }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      margin-bottom: 16px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      font-size: 14px;
+      color: #7c5cbf;
+      text-decoration: none;
+      margin-bottom: 8px;
+    }
+
+    .input-box {
+      width: 100%;
+      min-height: 56px;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #e0dcd5;
+      border-radius: 10px;
+      resize: vertical;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+    .input-box:focus { outline: none; border-color: #7c5cbf; }
+
+    .row { display: flex; gap: 10px; margin-top: 10px; }
+    .row input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #e0dcd5;
+      border-radius: 10px;
+      font-family: inherit;
+      min-width: 0;
+    }
+    .row input:focus { outline: none; border-color: #7c5cbf; }
+
+    .btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      background: #7c5cbf;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { opacity: 0.85; }
+
+    .plan-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0ece6;
+    }
+    .plan-item:last-child { border-bottom: none; }
+    .plan-info { flex: 1; min-width: 0; }
+    .plan-task {
+      font-size: 16px;
+      line-height: 1.4;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .plan-meta { font-size: 13px; color: #999; margin-top: 6px; }
+    .plan-meta .dur { color: #7c5cbf; font-weight: 600; }
+
+    .plan-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .btn-start {
+      background: #7c5cbf;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+    .btn-start:active { opacity: 0.85; }
+    .btn-start.done { background: #ddd; color: #999; }
+
+    .btn-del {
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    .btn-del:active { color: #f44336; }
+
+    .empty-tip {
+      text-align: center;
+      color: #bbb;
+      font-size: 14px;
+      padding: 20px 0;
+    }
+
+    .total-tip {
+      text-align: center;
+      font-size: 14px;
+      color: #7c5cbf;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <a class="back-btn" href="index.html">← 返回时间记录</a>
+  <h1>🌙 晚间规划</h1>
+  <p class="subtitle">写下今晚打算做的事，然后一条条开始</p>
+
+  <!-- 新增规划 -->
+  <div class="card">
+    <textarea class="input-box" id="planInput" placeholder="今晚打算做什么？比如：读 30 页书、跑步 20 分钟…"></textarea>
+    <div class="row">
+      <input type="number" id="planHour" placeholder="预计小时" min="0" step="1">
+      <input type="number" id="planMin" placeholder="预计分钟" min="0" max="59" step="1">
+    </div>
+    <button class="btn" id="btnAddPlan">添加到清单</button>
+  </div>
+
+  <!-- 规划清单 -->
+  <div class="card">
+    <h2 style="font-size:17px;margin-bottom:8px;">规划清单</h2>
+    <div id="planList"></div>
+    <div class="total-tip" id="totalTip"></div>
+  </div>
+
+<script>
+(function() {
+  'use strict';
+
+  var PLAN_KEY = 'night_plans_v1';
+  var RECORD_KEY = 'time_records_v1';  // 与 index.html 保持一致
+
+  var planInput = document.getElementById('planInput');
+  var planHour = document.getElementById('planHour');
+  var planMin = document.getElementById('planMin');
+  var btnAddPlan = document.getElementById('btnAddPlan');
+  var planList = document.getElementById('planList');
+  var totalTip = document.getElementById('totalTip');
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function formatDuration(mins) {
+    if (mins < 60) return mins + ' 分钟';
+    var h = Math.floor(mins / 60);
+    var m = mins % 60;
+    return m === 0 ? h + ' 小时' : h + ' 小时 ' + m + ' 分钟';
+  }
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, function(m) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
+    });
+  }
+
+  function loadPlans() {
+    try { return JSON.parse(localStorage.getItem(PLAN_KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function savePlans(plans) {
+    localStorage.setItem(PLAN_KEY, JSON.stringify(plans));
+  }
+
+  // ---------- 添加规划 ----------
+  btnAddPlan.addEventListener('click', function() {
+    var task = planInput.value.trim();
+    var h = parseInt(planHour.value, 10) || 0;
+    var m = parseInt(planMin.value, 10) || 0;
+    var total = h * 60 + m;
+
+    if (!task) { alert('请写一下规划内容～'); return; }
+    if (total <= 0) { alert('请填写预计时长'); return; }
+
+    var plans = loadPlans();
+    plans.push({
+      id: Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      task: task,
+      planned: total,
+      done: false
+    });
+    savePlans(plans);
+    planInput.value = '';
+    planHour.value = '';
+    planMin.value = '';
+    render();
+  });
+
+  // ---------- 渲染 ----------
+  function render() {
+    var plans = loadPlans();
+
+    if (plans.length === 0) {
+      planList.innerHTML = '<div class="empty-tip">还没有规划，先加一条吧～</div>';
+      totalTip.textContent = '';
+      return;
+    }
+
+    var totalPlanned = 0;
+    var html = '';
+    plans.forEach(function(p) {
+      totalPlanned += p.planned;
+      html += '<div class="plan-item">'
+            +   '<div class="plan-info">'
+            +     '<div class="plan-task">' + escapeHtml(p.task) + '</div>'
+            +     '<div class="plan-meta">预计 <span class="dur">' + formatDuration(p.planned) + '</span></div>'
+            +   '</div>'
+            +   '<div class="plan-actions">'
+            +     '<button class="btn-start' + (p.done ? ' done' : '') + '" '
+            +       'data-id="' + p.id + '" data-task="' + escapeHtml(p.task) + '" '
+            +       (p.done ? 'disabled' : '') + '>'
+            +       (p.done ? '已完成' : '开始')
+            +     '</button>'
+            +     '<button class="btn-del" data-id="' + p.id + '">×</button>'
+            +   '</div>'
+            + '</div>';
+    });
+    planList.innerHTML = html;
+    totalTip.textContent = '共 ' + plans.length + ' 项，预计总时长 ' + formatDuration(totalPlanned);
+
+    // 开始按钮：写入一个"进行中"标记，然后跳回 index.html
+    planList.querySelectorAll('.btn-start').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        var task = this.getAttribute('data-task');
+
+        // 用 sessionStorage 传递"当前要计时的任务"，只在本次会话有效
+        try {
+          sessionStorage.setItem('pending_timer_task', JSON.stringify({
+            id: id,
+            task: task,
+            startTs: Date.now()
+          }));
+        } catch (e) {}
+
+        location.href = 'index.html';
+      });
+    });
+
+    // 删除
+    planList.querySelectorAll('.btn-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        if (confirm('确定删除这条规划吗？')) {
+          var ps = loadPlans().filter(function(p) { return p.id !== id; });
+          savePlans(ps);
+          render();
+        }
+      });
+    });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
