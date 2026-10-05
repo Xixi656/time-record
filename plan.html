@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>晚间规划</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f4f1fa; color: #333;
+      padding: 16px; padding-bottom: 40px;
+    }
+    .back-btn { display: inline-block; font-size: 14px; color: #7c5cbf; text-decoration: none; margin-bottom: 8px; }
+    h1 { font-size: 22px; margin-bottom: 4px; text-align: center; }
+    .subtitle { text-align: center; font-size: 13px; color: #999; margin-bottom: 20px; }
+    .mode-list { display: flex; flex-direction: column; gap: 14px; }
+    .mode-card {
+      display: block; text-decoration: none; color: #333;
+      background: #fff; border-radius: 16px; padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border: 2px solid transparent;
+      transition: border-color .15s;
+    }
+    .mode-card:active { border-color: #7c5cbf; }
+    .mode-title { font-size: 18px; font-weight: 700; color: #7c5cbf; margin-bottom: 6px; }
+    .mode-desc { font-size: 14px; color: #888; line-height: 1.5; }
+    .mode-arrow { float: right; font-size: 20px; color: #ccc; margin-top: -24px; }
+  </style>
+</head>
+<body>
+
+  <a class="back-btn" href="index.html">← 返回时间记录</a>
+  <h1>🌙 晚间规划</h1>
+  <p class="subtitle">先选一下今晚的节奏</p>
+
+  <div class="mode-list">
+    <a class="mode-card" href="plan-list.html?mode=normal">
+      <div class="mode-title">🌤 规划 1 · 正常下班</div>
+      <div class="mode-desc">到家早、时间充足，可以安排学习、运动、放松</div>
+      <div class="mode-arrow">›</div>
+    </a>
+    <a class="mode-card" href="plan-list.html?mode=overtime">
+      <div class="mode-title">🌧 规划 2 · 有加班</div>
+      <div class="mode-desc">下班晚、精力有限，只安排少量轻任务</div>
+      <div class="mode-arrow">›</div>
+    </a>
+    <a class="mode-card" href="plan-list.html?mode=free">
+      <div class="mode-title">🌈 规划 3 · 自由安排</div>
+      <div class="mode-desc">不预设节奏，完全按自己状态来</div>
+      <div class="mode-arrow">›</div>
+    </a>
+  </div>
+
+</body>
+</html>
