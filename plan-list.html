@@ -188,4 +188,53 @@
     plans.forEach(function(p) {
       totalPlanned += p.planned;
       if (p.done) doneCount++;
-      html += '<div class="
+      html += '<div class="plan-item' + (p.done ? ' done' : '') + '">'
+            +   '<div class="plan-info">'
+            +     '<div class="plan-task">' + escapeHtml(p.task) + '</div>'
+            +     '<div class="plan-meta">预计 <span class="dur">' + formatDuration(p.planned) + '</span>'
+            +       (p.done ? ' · 今天已完成' : '')
+            +     '</div>'
+            +   '</div>'
+            +   '<div class="plan-actions">'
+            +     '<button class="btn-start' + (p.done ? ' done' : '') + '" '
+            +       'data-id="' + p.id + '" data-task="' + escapeHtml(p.task) + '" '
+            +       (p.done ? 'disabled' : '') + '>'
+            +       (p.done ? '已完成' : '开始')
+            +     '</button>'
+            +     '<button class="btn-del" data-id="' + p.id + '">×</button>'
+            +   '</div>'
+            + '</div>';
+    });
+    planList.innerHTML = html;
+    totalTip.textContent = '共 ' + plans.length + ' 项，已完成 ' + doneCount + ' 项，预计总时长 ' + formatDuration(totalPlanned);
+
+    planList.querySelectorAll('.btn-start').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        var task = this.getAttribute('data-task');
+        try {
+          sessionStorage.setItem('pending_timer_task', JSON.stringify({
+            id: id, task: task, startTs: Date.now()
+          }));
+        } catch (e) {}
+        location.href = 'index.html';
+      });
+    });
+
+    planList.querySelectorAll('.btn-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        if (confirm('确定删除这条任务吗？')) {
+          var ps = loadPlans().filter(function(p) { return p.id !== id; });
+          savePlans(ps);
+          render();
+        }
+      });
+    });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
