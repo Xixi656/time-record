@@ -13,7 +13,25 @@
       padding: 16px;
       padding-bottom: 40px;
     }
-    h1 { font-size: 22px; margin-bottom: 16px; text-align: center; }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .header h1 { font-size: 22px; }
+    .plan-link {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background: #7c5cbf;
+      padding: 8px 12px;
+      border-radius: 20px;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+    .plan-link:active { opacity: 0.85; }
 
     .card {
       background: #fff;
@@ -23,7 +41,6 @@
       margin-bottom: 16px;
     }
 
-    /* 模式切换 */
     .tabs {
       display: flex;
       gap: 6px;
@@ -63,11 +80,7 @@
     }
     .input-box:focus { outline: none; border-color: #14b8a6; }
 
-    .row {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    .row { display: flex; gap: 10px; margin-top: 10px; }
     .row input {
       flex: 1;
       padding: 12px;
@@ -79,11 +92,7 @@
     }
     .row input:focus { outline: none; border-color: #14b8a6; }
 
-    .field-label {
-      font-size: 13px;
-      color: #888;
-      margin: 12px 0 4px;
-    }
+    .field-label { font-size: 13px; color: #888; margin: 12px 0 4px; }
 
     .btn {
       width: 100%;
@@ -99,12 +108,14 @@
       -webkit-tap-highlight-color: transparent;
     }
     .btn:active { opacity: 0.85; }
-    .btn.gray { background: #9aa5a3; }
     .btn.red { background: #ef5350; }
 
-    /* 打点计时区 */
     .punch-panel { display: none; }
     .punch-panel.show { display: block; }
+    .range-panel { display: none; }
+    .range-panel.show { display: block; }
+    .manual-panel { display: none; }
+    .manual-panel.show { display: block; }
 
     .punch-status {
       text-align: center;
@@ -113,10 +124,7 @@
       border-radius: 12px;
       margin-bottom: 10px;
     }
-    .punch-status .label {
-      font-size: 13px;
-      color: #888;
-    }
+    .punch-status .label { font-size: 13px; color: #888; }
     .punch-status .time {
       font-size: 26px;
       font-weight: 700;
@@ -124,22 +132,14 @@
       margin-top: 4px;
       font-variant-numeric: tabular-nums;
     }
-    .punch-list {
-      margin-top: 12px;
+    .punch-from-plan {
+      text-align: center;
+      font-size: 13px;
+      color: #7c5cbf;
+      font-weight: 600;
+      margin-bottom: 8px;
     }
-    .punch-point {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      font-size: 14px;
-      border-bottom: 1px dashed #eee;
-      color: #555;
-    }
-    .punch-point:last-child { border-bottom: none; }
 
-    /* 时间范围区 */
-    .range-panel { display: none; }
-    .range-panel.show { display: block; }
     .range-panel input[type="datetime-local"] {
       width: 100%;
       padding: 12px;
@@ -149,9 +149,7 @@
       font-family: inherit;
       margin-top: 4px;
     }
-    .range-panel input[type="datetime-local"]:focus {
-      outline: none; border-color: #14b8a6;
-    }
+    .range-panel input[type="datetime-local"]:focus { outline: none; border-color: #14b8a6; }
     .range-duration {
       text-align: center;
       font-size: 14px;
@@ -160,10 +158,6 @@
       margin-top: 10px;
     }
 
-    .manual-panel { display: none; }
-    .manual-panel.show { display: block; }
-
-    /* 统计 */
     .summary { display: flex; gap: 10px; margin-bottom: 12px; }
     .summary-item {
       flex: 1;
@@ -175,7 +169,6 @@
     .summary-num { font-size: 20px; font-weight: 700; color: #14b8a6; }
     .summary-label { font-size: 12px; color: #888; margin-top: 4px; }
 
-    /* 历史列表 */
     .record-item {
       padding: 12px 0;
       border-bottom: 1px solid #f0ece6;
@@ -193,6 +186,8 @@
     }
     .record-meta { font-size: 13px; color: #999; margin-top: 6px; }
     .record-meta .duration { color: #14b8a6; font-weight: 600; }
+    .record-meta .from-plan { color: #7c5cbf; }
+
     .btn-del {
       align-self: flex-start;
       background: none;
@@ -204,6 +199,7 @@
       flex-shrink: 0;
     }
     .btn-del:active { color: #f44336; }
+
     .empty-tip {
       text-align: center;
       color: #bbb;
@@ -214,7 +210,10 @@
 </head>
 <body>
 
-  <h1>⏱ 时间记录</h1>
+  <div class="header">
+    <h1>⏱ 时间记录</h1>
+    <a class="plan-link" href="plan.html">🌙 晚间规划</a>
+  </div>
 
   <!-- 输入区 -->
   <div class="card">
@@ -224,10 +223,9 @@
       <div class="tab" data-mode="range">选时间段</div>
     </div>
 
-    <!-- 任务名（三种模式共用） -->
     <textarea class="input-box" id="taskInput" placeholder="做了什么？比如：写方案、看书、跑步…"></textarea>
 
-    <!-- 模式 1：手动填写 -->
+    <!-- 手动填写 -->
     <div class="manual-panel show" id="manualPanel">
       <div class="row">
         <input type="number" id="hourInput" placeholder="小时" min="0" step="1">
@@ -236,8 +234,9 @@
       <button class="btn" id="btnSaveManual">记录</button>
     </div>
 
-    <!-- 模式 2：打点计时 -->
+    <!-- 打点计时 -->
     <div class="punch-panel" id="punchPanel">
+      <div class="punch-from-plan" id="punchFromPlan" style="display:none;"></div>
       <div class="punch-status">
         <div class="label" id="punchLabel">未开始</div>
         <div class="time" id="punchClock">00:00:00</div>
@@ -246,7 +245,7 @@
       <div class="punch-list" id="punchList"></div>
     </div>
 
-    <!-- 模式 3：选时间段 -->
+    <!-- 选时间段 -->
     <div class="range-panel" id="rangePanel">
       <div class="field-label">开始时间</div>
       <input type="datetime-local" id="startTime">
@@ -281,33 +280,30 @@
 (function() {
   'use strict';
 
-  var STORAGE_KEY = 'time_records_v1';
+  var RECORD_KEY = 'time_records_v1';   // 保持原名，不抹掉旧数据
+  var PLAN_KEY = 'night_plans_v1';      // 与 plan.html 共享
 
-  // 元素
-  var taskInput    = document.getElementById('taskInput');
-  var tabs         = document.querySelectorAll('.tab');
-  var manualPanel  = document.getElementById('manualPanel');
-  var punchPanel   = document.getElementById('punchPanel');
-  var rangePanel   = document.getElementById('rangePanel');
+  var taskInput = document.getElementById('taskInput');
+  var tabs = document.querySelectorAll('.tab');
+  var manualPanel = document.getElementById('manualPanel');
+  var punchPanel = document.getElementById('punchPanel');
+  var rangePanel = document.getElementById('rangePanel');
 
-  // 手动
-  var hourInput    = document.getElementById('hourInput');
-  var minInput     = document.getElementById('minInput');
+  var hourInput = document.getElementById('hourInput');
+  var minInput = document.getElementById('minInput');
   var btnSaveManual = document.getElementById('btnSaveManual');
 
-  // 打点
-  var btnPunch     = document.getElementById('btnPunch');
-  var punchLabel   = document.getElementById('punchLabel');
-  var punchClock   = document.getElementById('punchClock');
-  var punchList    = document.getElementById('punchList');
+  var btnPunch = document.getElementById('btnPunch');
+  var punchLabel = document.getElementById('punchLabel');
+  var punchClock = document.getElementById('punchClock');
+  var punchList = document.getElementById('punchList');
+  var punchFromPlan = document.getElementById('punchFromPlan');
 
-  // 范围
-  var startTime    = document.getElementById('startTime');
-  var endTime      = document.getElementById('endTime');
+  var startTime = document.getElementById('startTime');
+  var endTime = document.getElementById('endTime');
   var rangeDuration = document.getElementById('rangeDuration');
   var btnSaveRange = document.getElementById('btnSaveRange');
 
-  // 统计与列表
   var recordList = document.getElementById('recordList');
   var sumCount = document.getElementById('sumCount');
   var sumToday = document.getElementById('sumToday');
@@ -316,8 +312,9 @@
   var currentMode = 'manual';
   var punchTimerId = null;
   var punchStartTs = null;
+  var punchPlanId = null;  // 如果这次计时来自"晚间规划"，记住规划 id
 
-  // ---------- 通用工具 ----------
+  // ---------- 通用 ----------
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
   function todayStr() {
     var d = new Date();
@@ -327,8 +324,12 @@
     var d = new Date();
     return todayStr() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
+  function fullTimeStrFromTs(ts) {
+    var d = new Date(ts);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+      + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
   function toLocalInputValue(date) {
-    // 生成 datetime-local 需要的格式：YYYY-MM-DDTHH:mm
     return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate())
       + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
   }
@@ -352,12 +353,19 @@
 
   // ---------- 存储 ----------
   function loadRecords() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    try { return JSON.parse(localStorage.getItem(RECORD_KEY)) || []; }
     catch (e) { return []; }
   }
   function saveRecords(records) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+    try { localStorage.setItem(RECORD_KEY, JSON.stringify(records)); }
     catch (e) { alert('存储空间不足，请删除一些旧记录后再试。'); }
+  }
+  function loadPlans() {
+    try { return JSON.parse(localStorage.getItem(PLAN_KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function savePlans(plans) {
+    localStorage.setItem(PLAN_KEY, JSON.stringify(plans));
   }
 
   // ---------- 模式切换 ----------
@@ -366,13 +374,10 @@
       currentMode = this.getAttribute('data-mode');
       tabs.forEach(function(t) { t.classList.remove('active'); });
       this.classList.add('active');
-
       manualPanel.classList.toggle('show', currentMode === 'manual');
       punchPanel.classList.toggle('show', currentMode === 'punch');
       rangePanel.classList.toggle('show', currentMode === 'range');
-
       if (currentMode === 'range') {
-        // 默认填最近 1 小时
         if (!startTime.value) {
           var end = new Date();
           var start = new Date(end.getTime() - 60 * 60 * 1000);
@@ -384,16 +389,14 @@
     });
   });
 
-  // ---------- 手动填写 ----------
+  // ---------- 手动 ----------
   btnSaveManual.addEventListener('click', function() {
     var task = taskInput.value.trim();
     var h = parseInt(hourInput.value, 10) || 0;
     var m = parseInt(minInput.value, 10) || 0;
     var total = h * 60 + m;
-
     if (!task) { alert('请写一下做了什么～'); return; }
     if (total <= 0) { alert('请填写时长（小时或分钟）'); return; }
-
     addRecord(task, total, fullTimeStr());
     taskInput.value = '';
     hourInput.value = '';
@@ -402,44 +405,68 @@
   });
 
   // ---------- 打点计时 ----------
+  function startPunchTimer(task, startTs, planId) {
+    punchStartTs = startTs || Date.now();
+    punchPlanId = planId || null;
+    taskInput.value = task;
+    punchLabel.textContent = '进行中：' + task;
+    punchList.innerHTML = '<div class="punch-point" style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;border-bottom:1px dashed #eee;color:#555;">'
+      + '<span>开始</span><span>'
+      + new Date(punchStartTs).toLocaleTimeString('zh-CN', {hour12:false}) + '</span></div>';
+    btnPunch.textContent = '结束并记录';
+    btnPunch.classList.add('red');
+
+    if (punchTimerId) clearInterval(punchTimerId);
+    punchTimerId = setInterval(function() {
+      var sec = Math.floor((Date.now() - punchStartTs) / 1000);
+      punchClock.textContent = formatHMS(sec);
+    }, 1000);
+    var sec0 = Math.floor((Date.now() - punchStartTs) / 1000);
+    punchClock.textContent = formatHMS(sec0);
+
+    if (punchPlanId) {
+      punchFromPlan.style.display = 'block';
+      punchFromPlan.textContent = '来自晚间规划 · 完成并记录后会标记为已完成';
+    } else {
+      punchFromPlan.style.display = 'none';
+    }
+  }
+
   btnPunch.addEventListener('click', function() {
     if (!punchStartTs) {
       // 开始
-      if (!taskInput.value.trim()) {
-        alert('请先写一下要做什么～');
-        return;
-      }
-      punchStartTs = Date.now();
-      punchLabel.textContent = '进行中：' + taskInput.value.trim();
-      punchList.innerHTML = '<div class="punch-point"><span>开始</span><span>'
-        + new Date(punchStartTs).toLocaleTimeString('zh-CN', {hour12:false}) + '</span></div>';
-      btnPunch.textContent = '结束并记录';
-      btnPunch.classList.add('red');
-      btnPunch.classList.remove('gray');
-
-      punchTimerId = setInterval(function() {
-        var sec = Math.floor((Date.now() - punchStartTs) / 1000);
-        punchClock.textContent = formatHMS(sec);
-      }, 1000);
-      punchClock.textContent = '00:00:00';
+      if (!taskInput.value.trim()) { alert('请先写一下要做什么～'); return; }
+      startPunchTimer(taskInput.value.trim(), Date.now(), null);
     } else {
       // 结束
-      clearInterval(punchTimerId);
-      punchTimerId = null;
-
+      if (punchTimerId) { clearInterval(punchTimerId); punchTimerId = null; }
       var elapsedSec = Math.floor((Date.now() - punchStartTs) / 1000);
-      var minutes = Math.max(1, Math.round(elapsedSec / 60)); // 至少 1 分钟
-
+      var minutes = Math.max(1, Math.round(elapsedSec / 60));
       var startStr = fullTimeStrFromTs(punchStartTs);
       var endStr = fullTimeStr();
       var task = taskInput.value.trim();
+      var planId = punchPlanId;
 
-      addRecord(task, minutes, startStr + ' → ' + endStr);
+      addRecord(task, minutes, startStr + ' → ' + endStr, planId ? 'plan' : '');
+
+      // 若来自规划，则把对应规划标记为已完成
+      if (planId) {
+        var plans = loadPlans().map(function(p) {
+          if (p.id === planId) {
+            p.done = true;
+            p.doneAt = endStr;
+            p.actual = minutes;
+          }
+          return p;
+        });
+        savePlans(plans);
+      }
 
       // 重置
       punchStartTs = null;
+      punchPlanId = null;
       punchLabel.textContent = '已记录';
-      punchClock.textContent = formatHMS(elapsedSec);
+      punchFromPlan.style.display = 'none';
       btnPunch.textContent = '开始计时';
       btnPunch.classList.remove('red');
       taskInput.value = '';
@@ -447,24 +474,12 @@
     }
   });
 
-  function fullTimeStrFromTs(ts) {
-    var d = new Date(ts);
-    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
-      + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
-  }
-
   // ---------- 时间范围 ----------
   function updateRangeDuration() {
-    if (!startTime.value || !endTime.value) {
-      rangeDuration.textContent = '';
-      return;
-    }
+    if (!startTime.value || !endTime.value) { rangeDuration.textContent = ''; return; }
     var s = new Date(startTime.value).getTime();
     var e = new Date(endTime.value).getTime();
-    if (e <= s) {
-      rangeDuration.textContent = '结束时间必须晚于开始时间';
-      return;
-    }
+    if (e <= s) { rangeDuration.textContent = '结束时间必须晚于开始时间'; return; }
     var mins = Math.round((e - s) / 60000);
     rangeDuration.textContent = '时长：' + formatDuration(mins);
   }
@@ -477,18 +492,13 @@
     var task = taskInput.value.trim();
     if (!task) { alert('请写一下做了什么～'); return; }
     if (!startTime.value || !endTime.value) { alert('请选择开始和结束时间'); return; }
-
     var s = new Date(startTime.value).getTime();
     var e = new Date(endTime.value).getTime();
     if (e <= s) { alert('结束时间必须晚于开始时间'); return; }
-
     var mins = Math.max(1, Math.round((e - s) / 60000));
     var timeText = startTime.value.replace('T', ' ') + ' → ' + endTime.value.replace('T', ' ');
-
     addRecord(task, mins, timeText);
-
     taskInput.value = '';
-    // 下一次默认接着上一段的结束时间
     startTime.value = endTime.value;
     endTime.value = '';
     rangeDuration.textContent = '';
@@ -496,12 +506,13 @@
   });
 
   // ---------- 添加记录 ----------
-  function addRecord(task, minutes, timeText) {
+  function addRecord(task, minutes, timeText, tag) {
     var records = loadRecords();
     records.unshift({
       task: task,
       minutes: minutes,
-      time: timeText
+      time: timeText,
+      tag: tag || ''
     });
     saveRecords(records);
   }
@@ -509,7 +520,6 @@
   // ---------- 渲染 ----------
   function renderList() {
     var records = loadRecords();
-
     var today = todayStr();
     var todayMins = 0;
     var totalMins = 0;
@@ -534,6 +544,7 @@
             +     '<div class="record-meta">'
             +       '<span class="duration">' + formatDuration(r.minutes) + '</span>'
             +       ' · ' + escapeHtml(r.time)
+            +       (r.tag === 'plan' ? ' · <span class="from-plan">🌙 规划</span>' : '')
             +     '</div>'
             +   '</div>'
             +   '<button class="btn-del" data-time="' + escapeHtml(r.time) + '" data-task="' + escapeHtml(r.task) + '">×</button>'
@@ -556,8 +567,30 @@
     });
   }
 
+  // ---------- 检查是否从 plan.html 跳过来要启动计时 ----------
+  function checkPendingTimer() {
+    var raw = null;
+    try { raw = sessionStorage.getItem('pending_timer_task'); } catch (e) {}
+    if (!raw) return;
+    try { sessionStorage.removeItem('pending_timer_task'); } catch (e) {}
+    var data = JSON.parse(raw);
+    if (!data || !data.task) return;
+
+    // 自动切到打点计时 tab
+    currentMode = 'punch';
+    tabs.forEach(function(t) { t.classList.remove('active'); });
+    document.querySelector('.tab[data-mode="punch"]').classList.add('active');
+    manualPanel.classList.remove('show');
+    rangePanel.classList.remove('show');
+    punchPanel.classList.add('show');
+
+    startPunchTimer(data.task, data.startTs || Date.now(), data.id);
+    renderList();
+  }
+
   // ---------- 初始化 ----------
   renderList();
+  checkPendingTimer();
 })();
 </script>
 </body>
