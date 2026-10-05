@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>任务清单</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f4f1fa; color: #333;
+      padding: 16px; padding-bottom: 40px;
+    }
+    .back-btn { display: inline-block; font-size: 14px; color: #7c5cbf; text-decoration: none; margin-bottom: 8px; }
+    h1 { font-size: 20px; margin-bottom: 4px; text-align: center; }
+    .subtitle { text-align: center; font-size: 13px; color: #999; margin-bottom: 16px; }
+
+    .card {
+      background: #fff; border-radius: 16px; padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px;
+    }
+    .input-box {
+      width: 100%; min-height: 56px; padding: 12px; font-size: 16px;
+      border: 1px solid #e0dcd5; border-radius: 10px;
+      resize: vertical; font-family: inherit; line-height: 1.5;
+    }
+    .input-box:focus { outline: none; border-color: #7c5cbf; }
+    .row { display: flex; gap: 10px; margin-top: 10px; }
+    .row input {
+      flex: 1; padding: 12px; font-size: 16px; border: 1px solid #e0dcd5;
+      border-radius: 10px; font-family: inherit; min-width: 0;
+    }
+    .btn {
+      width: 100%; margin-top: 12px; padding: 14px; font-size: 16px;
+      font-weight: 600; color: #fff; background: #7c5cbf; border: none;
+      border-radius: 10px; cursor: pointer;
+    }
+    .btn:active { opacity: 0.85; }
+
+    .plan-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 12px 0; border-bottom: 1px solid #f0ece6;
+    }
+    .plan-item:last-child { border-bottom: none; }
+    .plan-item.done .plan-task { text-decoration: line-through; color: #bbb; }
+    .plan-info { flex: 1; min-width: 0; }
+    .plan-task { font-size: 16px; line-height: 1.4; word-break: break-word; white-space: pre-wrap; }
+    .plan-meta { font-size: 13px; color: #999; margin-top: 6px; }
+    .plan-meta .dur { color: #7c5cbf; font-weight: 600; }
+    .plan-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; margin-top: 2px; }
+    .btn-start {
+      background: #7c5cbf; color: #fff; border: none; border-radius: 8px;
+      padding: 8px 12px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .btn-start:active { opacity: 0.85; }
+    .btn-start.done { background: #ddd; color: #999; }
+    .btn-del { background: none; border: none; color: #ccc; font-size: 20px; cursor: pointer; padding: 0 4px; }
+    .btn-del:active { color: #f44336; }
+    .empty-tip { text-align: center; color: #bbb; font-size: 14px; padding: 20px 0; }
+    .total-tip { text-align: center; font-size: 14px; color: #7c5cbf; font-weight: 600; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+  <a class="back-btn" href="plan.html">← 重新选择节奏</a>
+  <h1 id="modeTitle">任务清单</h1>
+  <p class="subtitle" id="modeDesc"></p>
+
+  <div class="card">
+    <textarea class="input-box" id="planInput" placeholder="加一条任务，比如：读 30 页书、跑步 20 分钟…"></textarea>
+    <div class="row">
+      <input type="number" id="planHour" placeholder="预计小时" min="0" step="1">
+      <input type="number" id="planMin" placeholder="预计分钟" min="0" max="59" step="1">
+    </div>
+    <button class="btn" id="btnAddPlan">添加到清单</button>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:17px;margin-bottom:8px;">今日任务</h2>
+    <div id="planList"></div>
+    <div class="total-tip" id="totalTip"></div>
+  </div>
+
+<script>
+(function() {
+  'use strict';
+
+  var PLAN_KEY_PREFIX = 'night_plans_';   // 每个模式独立一份清单
+  var RECORD_KEY = 'time_records_v1';
+
+  var mode = 'normal';
+  var params = new URLSearchParams(location.search);
+  if (params.get('mode')) mode = params.get('mode');
+
+  var MODE_INFO = {
+    normal:   { title: '🌤 正常下班', desc: '时间充足，可以安排多一些' },
+    overtime: { title: '🌧 有加班',   desc: '精力有限，只安排轻任务' },
+    free:     { title: '🌈 自由安排', desc: '完全按自己状态来' }
+  };
+  document.getElementById('modeTitle').textContent = MODE_INFO[mode].title + ' · 任务清单';
+  document.getElementById('modeDesc').textContent = MODE_INFO[mode].desc;
+
+  var PLAN_KEY = PLAN_KEY_PREFIX + mode;
+
+  var planInput = document.getElementById('planInput');
+  var planHour = document.getElementById('planHour');
+  var planMin = document.getElementById('planMin');
+  var btnAddPlan = document.getElementById('btnAddPlan');
+  var planList = document.getElementById('planList');
+  var totalTip = document.getElementById('totalTip');
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function formatDuration(mins) {
+    if (mins < 60) return mins + ' 分钟';
+    var h = Math.floor(mins / 60);
+    var m = mins % 60;
+    return m === 0 ? h + ' 小时' : h + ' 小时 ' + m + ' 分钟';
+  }
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, function(m) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
+    });
+  }
+
+  function loadPlans() {
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem(PLAN_KEY)) || []; }
+    catch (e) { raw = []; }
+
+    // 关键：如果 doneDate 不是今天，说明这条任务是之前完成的 → 重置为未完成，可再次进行
+    var today = todayStr();
+    var changed = false;
+    raw.forEach(function(p) {
+      if (p.done && p.doneDate !== today) {
+        p.done = false;
+        p.doneDate = '';
+        p.doneAt = '';
+        p.actual = null;
+        changed = true;
+      }
+    });
+    if (changed) savePlans(raw);
+    return raw;
+  }
+  function savePlans(plans) {
+    localStorage.setItem(PLAN_KEY, JSON.stringify(plans));
+  }
+
+  btnAddPlan.addEventListener('click', function() {
+    var task = planInput.value.trim();
+    var h = parseInt(planHour.value, 10) || 0;
+    var m = parseInt(planMin.value, 10) || 0;
+    var total = h * 60 + m;
+    if (!task) { alert('请写一下任务内容～'); return; }
+    if (total <= 0) { alert('请填写预计时长'); return; }
+
+    var plans = loadPlans();
+    plans.push({
+      id: Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      task: task,
+      planned: total,
+      done: false,
+      doneDate: ''
+    });
+    savePlans(plans);
+    planInput.value = '';
+    planHour.value = '';
+    planMin.value = '';
+    render();
+  });
+
+  function render() {
+    var plans = loadPlans();
+
+    if (plans.length === 0) {
+      planList.innerHTML = '<div class="empty-tip">还没有任务，先加一条吧～</div>';
+      totalTip.textContent = '';
+      return;
+    }
+
+    var totalPlanned = 0;
+    var doneCount = 0;
+    var html = '';
+    plans.forEach(function(p) {
+      totalPlanned += p.planned;
+      if (p.done) doneCount++;
+      html += '<div class="
